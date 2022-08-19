@@ -26,6 +26,9 @@ public class DoctorService {
 
 	@Autowired
 	private PatientRepository patientRepository;
+	
+	@Autowired
+	private PatientService patientService;
 
 	public Doctor add_Doctor(Doctor doctor) {
 
@@ -134,4 +137,37 @@ public class DoctorService {
 		return doctors;
 	}
 
+public List<Doctor> suggest_doctor(int id) {
+		
+		Patient patient = patientService.get_patient(id);
+		String symptom = patient.getSymptom();
+		String doctor_spec = getSpecialization(symptom);
+		List<Doctor> doctors = doctorRepository.findBySpecialityAndCity(doctor_spec,patient.getCity());		
+		return doctors;
+		
+	}
+	
+	public List<Doctor> get_doctor_city(int id) {
+		
+		List<Doctor> doctors = new ArrayList<>();			
+		try {
+			Patient patient=patientService.get_patient(id);	
+			doctors = doctorRepository.findByCity(patient.getCity());
+		}catch(Exception e) {}
+		return doctors;
+		
+	}
+	
+	public List<Doctor> get_doctor_speciality(int id) {
+		
+		List<Doctor> doctors = new ArrayList<>();
+		try {
+			Patient patient = patientService.get_patient(id);
+			String symptom = patient.getSymptom();
+			String doctor_spec = getSpecialization(symptom);
+			doctors = doctorRepository.findBySpeciality(doctor_spec);
+		}catch(Exception e) {}
+		return doctors;
+		
+	}
 }

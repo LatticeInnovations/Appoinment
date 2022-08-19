@@ -7,6 +7,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
@@ -156,7 +157,29 @@ public class AppointmentService {
 		List<Appointment> appoint = new ArrayList<>();
 		try {
 			appoint = (List<Appointment>) appointmentRepository.findAll();
-
+			for (Appointment ap : appoint) {
+				List<Doctor> doctors = new ArrayList<>();
+				try {
+					doctors = (List<Doctor>) doctorRepository.findAll();
+					for (Doctor d : doctors) {
+						List<Appointment> appointments = appointmentRepository.findByDocId(d.getId());
+						for (Appointment a : appointments) {
+							Optional<Patient> opt = patientRepository.findById(a.getPatId());
+							Patient p = opt.get();
+							HashMap<String, Object> details = new HashMap<>();
+							details.put("Patient_Id", p.getId());
+							details.put("Patient_Name", p.getName());
+							details.put("Patient_Email", p.getEmail());
+							details.put("Patient_Phone", p.getPhone());
+							details.put("Patient_Symptom", p.getSymptom());
+							a.setDetails(details);
+						}
+						d.setAppointment(appointments);
+					}
+				} catch (Exception e) {
+				}
+				return appoint;
+			}
 		} catch (Exception e) {
 
 		}

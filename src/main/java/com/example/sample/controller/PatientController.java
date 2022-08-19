@@ -92,7 +92,7 @@ public class PatientController {
 	@GetMapping("/suggestsymptom/{symptom}")
 	public ResponseEntity<Object> suggestDoctorBySymptom(@PathVariable("symptom") String symptom) {
 
-		List<Doctor> doctors2 = doctorService.get_doctor_speciality_symptom(symptom);
+		List<Doctor> doctors2 = doctorService.get_doctor_speciality_symptom(symptom.toUpperCase());
 		if (doctors2.size() <= 0)
 			return ResponseEntity.status(HttpStatus.NOT_FOUND)
 					.body(new String("There isn’t any doctor present for your symptom"));
@@ -101,6 +101,39 @@ public class PatientController {
 		for (Doctor d : doctors2) {
 			HashMap<String, Object> hashMap = new HashMap<>();
 			hashMap.put("id", d.getId());
+			hashMap.put("name", d.getName());
+			hashMap.put("city", d.getCity());
+			hashMap.put("email", d.getEmail());
+			hashMap.put("phone", d.getPhone());
+			hashMap.put("speciality", d.getSpeciality());
+			doctors_map.add(hashMap);
+		}
+		return ResponseEntity.ok().body(doctors_map);
+
+	}
+	
+	@GetMapping("/suggest/{id}")
+	public ResponseEntity<Object> suggestDoctor(@PathVariable("id") int id) {
+
+		List<Doctor> doctors = doctorService.get_doctor_city(id);
+		if (doctors.size() <= 0) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND)
+					.body(new String("We are still waiting to expand to your location"));
+		}
+
+		List<Doctor> doctors1 = doctorService.get_doctor_speciality(id);
+		if (doctors1.size() <= 0)
+			return ResponseEntity.status(HttpStatus.NOT_FOUND)
+					.body(new String("There isn’t any doctor present at your location for your symptom"));
+
+		List<Doctor> doctors2 = doctorService.suggest_doctor(id);
+		if (doctors2.size() <= 0)
+			return ResponseEntity.status(HttpStatus.NOT_FOUND)
+					.body(new String("There isn’t any doctor present at your location for your symptom"));
+
+		List<HashMap<String, Object>> doctors_map = new ArrayList<>();
+		for (Doctor d : doctors2) {
+			HashMap<String, Object> hashMap = new HashMap<>();
 			hashMap.put("name", d.getName());
 			hashMap.put("city", d.getCity());
 			hashMap.put("email", d.getEmail());

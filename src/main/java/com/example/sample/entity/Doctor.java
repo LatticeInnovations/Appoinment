@@ -7,6 +7,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Transient;
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 
@@ -25,6 +26,7 @@ public class Doctor {
 	private String city;
 
 	@NotBlank(message = "Please Enter Doctor Email")
+	@Email
 	private String email;
 
 	@NotBlank(message = "Please Enter Doctor Phone Number")
