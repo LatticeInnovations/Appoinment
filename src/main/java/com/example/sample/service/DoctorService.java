@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,7 +27,7 @@ public class DoctorService {
 
 	@Autowired
 	private PatientRepository patientRepository;
-	
+
 	@Autowired
 	private PatientService patientService;
 
@@ -137,37 +138,53 @@ public class DoctorService {
 		return doctors;
 	}
 
-public List<Doctor> suggest_doctor(int id) {
-		
+	public List<Doctor> suggest_doctor(int id) {
+
 		Patient patient = patientService.get_patient(id);
 		String symptom = patient.getSymptom();
 		String doctor_spec = getSpecialization(symptom);
-		List<Doctor> doctors = doctorRepository.findBySpecialityAndCity(doctor_spec,patient.getCity());		
+		List<Doctor> doctors = doctorRepository.findBySpecialityAndCity(doctor_spec, patient.getCity());
 		return doctors;
-		
+
 	}
-	
+
 	public List<Doctor> get_doctor_city(int id) {
-		
-		List<Doctor> doctors = new ArrayList<>();			
+
+		List<Doctor> doctors = new ArrayList<>();
 		try {
-			Patient patient=patientService.get_patient(id);	
+			Patient patient = patientService.get_patient(id);
 			doctors = doctorRepository.findByCity(patient.getCity());
-		}catch(Exception e) {}
+		} catch (Exception e) {
+		}
 		return doctors;
-		
+
 	}
-	
+
 	public List<Doctor> get_doctor_speciality(int id) {
-		
+
 		List<Doctor> doctors = new ArrayList<>();
 		try {
 			Patient patient = patientService.get_patient(id);
 			String symptom = patient.getSymptom();
 			String doctor_spec = getSpecialization(symptom);
 			doctors = doctorRepository.findBySpeciality(doctor_spec);
-		}catch(Exception e) {}
+		} catch (Exception e) {
+		}
 		return doctors;
-		
+
+	}
+
+	public void updateDoctor(Doctor doctor, int id) {
+		List<Doctor> list = new ArrayList<>();
+		list = list.stream().map(p -> {
+			if (p.getId() == id) {
+				p.setName(p.getName());
+				p.setCity(p.getCity());
+				p.setEmail(p.getEmail());
+				p.setPhone(p.getPhone());
+				p.setSpeciality(p.getSpeciality());
+			}
+			return p;
+		}).collect(Collectors.toList());
 	}
 }

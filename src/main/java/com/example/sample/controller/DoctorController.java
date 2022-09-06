@@ -13,11 +13,13 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.sample.entity.Doctor;
+import com.example.sample.entity.Patient;
 import com.example.sample.service.DoctorService;
 
 @RestController
@@ -78,6 +80,13 @@ public class DoctorController {
 			return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 		return ResponseEntity.ok(doctor);
 
+	}
+	
+	@PutMapping("/{id}")
+	public Doctor updateDoctor(@RequestBody Doctor doctor, @PathVariable("id") int id) {
+		doctorService.updateDoctor(doctor, id);
+		Doctor doctor2 = doctorService.add_Doctor(doctor);
+		return doctor2;
 	}
 
 }

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -103,6 +104,20 @@ public class PatientService {
 		} catch (Exception e) {
 			return null;
 		}
+	}
+	
+	public void updatePatient(Patient patient, int id) {
+		List<Patient> list = new ArrayList<>();
+		list = list.stream().map(p -> {
+			if (p.getId() == id) {
+				p.setName(p.getName());
+				p.setCity(p.getCity());
+				p.setEmail(p.getEmail());
+				p.setPhone(p.getPhone());
+				p.setSymptom(p.getSymptom());
+			}
+			return p;
+		}).collect(Collectors.toList());
 	}
 
 }
