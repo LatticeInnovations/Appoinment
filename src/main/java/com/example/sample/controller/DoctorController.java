@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.sample.entity.Doctor;
-import com.example.sample.entity.Patient;
 import com.example.sample.service.DoctorService;
 
 @RestController
@@ -29,7 +28,7 @@ public class DoctorController {
 	@Autowired
 	private DoctorService doctorService;
 
-	@PostMapping("/add")
+	@PostMapping("")
 	public ResponseEntity<String> addDoctor(@Valid @RequestBody Doctor doctor, BindingResult result) {
 
 		String errors = "";
@@ -61,7 +60,7 @@ public class DoctorController {
 
 	}
 
-	@GetMapping("/")
+	@GetMapping("")
 	public ResponseEntity<List<Doctor>> getDoctors() {
 
 		List<Doctor> doctors = doctorService.get_doctors();

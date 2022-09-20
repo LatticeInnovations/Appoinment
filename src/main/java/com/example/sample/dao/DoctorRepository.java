@@ -13,6 +13,6 @@ public interface DoctorRepository extends CrudRepository<Doctor, Integer>{
 	
 	public List<Doctor> findByCity(String city);
 	
-	public List<Doctor> findBySpeciality(String city);
+	public List<Doctor> findBySpeciality(String speciality);
 	
 }

@@ -112,33 +112,36 @@ public class AppointmentService {
 		String docValue = docValueId.get().getSpeciality();
 
 		Optional<Patient> patientValueId = patientRepository.findById(appointment.getPatId());
-		String patValue = patientValueId.get().getSymptom();
+		List<String> patValue = patientValueId.get().getSymptom();
+		for (int temp = 0; temp < patValue.size(); temp++) {
+			String sym = patientValueId.get().getSymptom().get(temp);
 
-		if (docValue.equals(doctorService.getSpecialization(patValue))) {
-			List<Appointment> appointments = appointmentRepository.findByDocIdAndAppointDate(appointment.getDocId(),
-					appointment.getAppointDate());
-			if (appointments.size() > 0) {
-				List<Appointment> appointments1;
-				if (flag == 1)
-					appointments1 = appointmentRepository
-							.findByDocIdAndAppointDateAndAppointTimeBetweenOrAppointTimeBetween(appointment.getDocId(),
-									appointment.getAppointDate(), appointment.getAppointTime(), increment_time,
-									"01:00 PM", increment_time1);
-				else
-					appointments1 = appointmentRepository.findByDocIdAndAppointDateAndAppointTimeBetween(
-							appointment.getDocId(), appointment.getAppointDate(), appointment.getAppointTime(),
-							increment_time);
-				if (appointments1.size() > 0)
-					return "The doctor already have another appointment at the same time";
+			if (docValue.equals(doctorService.getSpecialization(sym))) {
+				List<Appointment> appointments = appointmentRepository.findByDocIdAndAppointDate(appointment.getDocId(),
+						appointment.getAppointDate());
+				if (appointments.size() > 0) {
+					List<Appointment> appointments1;
+					if (flag == 1)
+						appointments1 = appointmentRepository
+								.findByDocIdAndAppointDateAndAppointTimeBetweenOrAppointTimeBetween(
+										appointment.getDocId(), appointment.getAppointDate(),
+										appointment.getAppointTime(), increment_time, "01:00 PM", increment_time1);
+					else
+						appointments1 = appointmentRepository.findByDocIdAndAppointDateAndAppointTimeBetween(
+								appointment.getDocId(), appointment.getAppointDate(), appointment.getAppointTime(),
+								increment_time);
+					if (appointments1.size() > 0)
+						return "The doctor already have another appointment at the same time";
+				}
+				appoint = appointmentRepository.save(appointment);
+				if (appoint == null)
+					return "Please Try Again Later";
+				return "Appointment Appointed Successfully";
+			} else {
+				return "This Doctor is not Specialist for You";
 			}
-			appoint = appointmentRepository.save(appointment);
-			if (appoint == null)
-				return "Please Try Again Later";
-			return "Appointment Appointed Successfully";
-		} else {
-			return "This Doctor is not Specialist for You";
 		}
-
+		return null;
 	}
 
 	public boolean delete_appoint(int id) {

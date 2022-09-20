@@ -6,6 +6,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityTransaction;
+import javax.persistence.Persistence;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -29,11 +34,16 @@ public class PatientService {
 	private DoctorRepository doctorRepository;
 
 	public Patient add_Patient(Patient patient) {
-
+		
 		Patient pat = null;
 		try {
 			patient.setCity(patient.getCity().toUpperCase());
-			patient.setSymptom(patient.getSymptom().toUpperCase());
+			List<String> list = patient.getSymptom();
+			List<String> symptom = list.stream().map(String::toUpperCase).collect(Collectors.toList());
+			//List<String> symptom = patient.getSymptom();
+			patient.setSymptom(symptom);
+			
+//			patient.setSymptom(patient.getSymptom().toUpperCase());
 			pat = patientRepository.save(patient);
 		} catch (Exception e) {
 		}

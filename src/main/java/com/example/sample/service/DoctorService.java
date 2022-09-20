@@ -127,25 +127,35 @@ public class DoctorService {
 		return doctor_spec;
 
 	}
-
+	
 	public List<Doctor> get_doctor_speciality_symptom(String symptom) {
 		List<Doctor> doctors = new ArrayList<>();
 		try {
 			String doctor_spec = getSpecialization(symptom);
+			System.out.println("spec "+doctor_spec);
 			doctors = doctorRepository.findBySpeciality(doctor_spec);
 		} catch (Exception e) {
 		}
+		System.out.println("list "+doctors);
 		return doctors;
 	}
 
 	public List<Doctor> suggest_doctor(int id) {
 
 		Patient patient = patientService.get_patient(id);
-		String symptom = patient.getSymptom();
-		String doctor_spec = getSpecialization(symptom);
-		List<Doctor> doctors = doctorRepository.findBySpecialityAndCity(doctor_spec, patient.getCity());
+		List<String> symptom = patient.getSymptom();
+		List<Doctor> doctors =  new ArrayList<>();
+		try {
+			for(int temp = 0; temp<symptom.size();temp++) {
+				String sym = symptom.get(temp);
+				String doctor_spec = getSpecialization(sym);
+				doctors = doctorRepository.findBySpecialityAndCity(doctor_spec, patient.getCity());
+			}
+//			return doctors;
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
 		return doctors;
-
 	}
 
 	public List<Doctor> get_doctor_city(int id) {
@@ -165,12 +175,16 @@ public class DoctorService {
 		List<Doctor> doctors = new ArrayList<>();
 		try {
 			Patient patient = patientService.get_patient(id);
-			String symptom = patient.getSymptom();
-			String doctor_spec = getSpecialization(symptom);
-			doctors = doctorRepository.findBySpeciality(doctor_spec);
+			List<String> symptom = patient.getSymptom();
+			for(int temp = 0; temp<symptom.size();temp++) {
+				String sym = symptom.get(temp);
+				String doctor_spec = getSpecialization(sym);
+				doctors = doctorRepository.findBySpeciality(doctor_spec);
+			}
+			return doctors;
 		} catch (Exception e) {
 		}
-		return doctors;
+		return null;
 
 	}
 

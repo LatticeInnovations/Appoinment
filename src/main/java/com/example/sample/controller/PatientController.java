@@ -3,7 +3,6 @@ package com.example.sample.controller;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Scanner;
 
 import javax.validation.Valid;
 
@@ -36,7 +35,7 @@ public class PatientController {
 	@Autowired
 	private DoctorService doctorService;
 
-	@PostMapping("/add")
+	@PostMapping("")
 	public ResponseEntity<String> addPatient(@Valid @RequestBody Patient patient, BindingResult result) {
 
 		String errors = "";
@@ -52,9 +51,29 @@ public class PatientController {
 
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errors);
 		}
-		Patient p = patientService.add_Patient(patient);
-		if (p == null)
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Please Try Again Later");
+
+		if (patient.getSymptom().size() == 0) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Minimun one symptom is required.");
+		} else {
+			for (int temp = 0; temp < patient.getSymptom().size(); temp++) {
+				for (int j = 0; j < temp + 1; j++) {
+					if (patient.getSymptom().get(temp).equals("Arthritis")
+							|| patient.getSymptom().get(temp).toUpperCase().equals("Backpain".toUpperCase())
+							|| patient.getSymptom().get(temp).toUpperCase().equals("Tissue injuries".toUpperCase())
+							|| patient.getSymptom().get(temp).toUpperCase().equals("Dysmenorrhea".toUpperCase())
+							|| patient.getSymptom().get(temp).toUpperCase().equals("Skin infection".toUpperCase())
+							|| patient.getSymptom().get(temp).toUpperCase().equals("skin burn".toUpperCase())
+							|| patient.getSymptom().get(temp).toUpperCase().equals("Ear pain".toUpperCase())) {
+						continue;
+					} else {
+						return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+								"Wrong Symptom For Patient, Choose('Arthritis','Backpain','Tissue injuries','Dysmenorrhea','Skin infection','skin burn','Ear pain')");
+					}
+				}
+			}
+			patientService.add_Patient(patient);
+		}
+
 		return ResponseEntity.ok("Patient Created Successfully");
 
 	}
@@ -70,7 +89,7 @@ public class PatientController {
 
 	}
 
-	@GetMapping("/")
+	@GetMapping("")
 	public ResponseEntity<List<Patient>> getPatients() {
 
 		List<Patient> patients = patientService.get_patients();
@@ -82,19 +101,20 @@ public class PatientController {
 	}
 
 	@GetMapping("/{id}")
-	public ResponseEntity<Patient> getPatient(@PathVariable("id") int id) {
+	public ResponseEntity<String> getPatient(@PathVariable("id") int id) {
 
 		Patient patient = patientService.get_patient(id);
 		if (patient == null)
 			return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-		return ResponseEntity.ok(patient);
+		return ResponseEntity.ok(""+patient);
 
 	}
 
-	@GetMapping("/suggestsymptom/{symptom}")
+	@GetMapping("/suggest/{symptom}")
 	public ResponseEntity<Object> suggestDoctorBySymptom(@PathVariable("symptom") String symptom) {
 
 		List<Doctor> doctors2 = doctorService.get_doctor_speciality_symptom(symptom.toUpperCase());
+		System.out.println("lis of doctors "+doctors2);
 		if (doctors2.size() <= 0)
 			return ResponseEntity.status(HttpStatus.NOT_FOUND)
 					.body(new String("There isn’t any doctor present for your symptom"));
@@ -113,8 +133,8 @@ public class PatientController {
 		return ResponseEntity.ok().body(doctors_map);
 
 	}
-	
-	@GetMapping("/suggest/{id}")
+
+	@GetMapping("/suggestById/{id}")
 	public ResponseEntity<Object> suggestDoctor(@PathVariable("id") int id) {
 
 		List<Doctor> doctors = doctorService.get_doctor_city(id);
@@ -136,6 +156,7 @@ public class PatientController {
 		List<HashMap<String, Object>> doctors_map = new ArrayList<>();
 		for (Doctor d : doctors2) {
 			HashMap<String, Object> hashMap = new HashMap<>();
+			hashMap.put("id", d.getId());
 			hashMap.put("name", d.getName());
 			hashMap.put("city", d.getCity());
 			hashMap.put("email", d.getEmail());
@@ -146,7 +167,7 @@ public class PatientController {
 		return ResponseEntity.ok().body(doctors_map);
 
 	}
-	
+
 	@PutMapping("/{id}")
 	public Patient updatePatient(@RequestBody Patient patient, @PathVariable("id") int id) {
 		patientService.updatePatient(patient, id);
